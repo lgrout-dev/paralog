@@ -5,10 +5,10 @@ generer_logs.py — Projet ParaLog (CESI, S3)
 Génère un journal d'accès au format Apache « combined », réaliste et reproductible :
 la même graine donne exactement le même fichier, sur toutes les machines.
 
-Exemples :
-    python3 generer_logs.py                         # fichier du projet (~2 Go, 9 millions de lignes)
-    python3 generer_logs.py --lignes 100000 -o echantillon_access.log
-    python3 generer_logs.py --lignes 20000 --graine 21 --date 2026-10-05 -o access_small.log
+Exemples (depuis la racine du dépôt) :
+    python3 scripts/generer_logs.py -o data/access.log    # fichier du projet (~2 Go, 9 millions de lignes)
+    python3 scripts/generer_logs.py --lignes 100000 -o data/echantillon_access.log
+    python3 scripts/generer_logs.py --lignes 20000 --graine 21 --date 2026-10-05 -o data/access_small.log
 
 Format d'une ligne (champs séparés par des espaces, numérotés comme pour `cut -d' ' -fN`) :
     1 IP   2 -   3 -   4 [date:heure   5 fuseau]   6 "MÉTHODE   7 chemin   8 HTTP/1.1"
