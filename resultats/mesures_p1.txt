@@ -1,0 +1,22 @@
+=== Mesures de performance ParaLog — P1 (version séquentielle) ===
+
+Commande  : python3 src/analyse_seq.py data/access.log
+Journal   : data/access.log (9 000 000 lignes, ~1,86 Go)
+Machine   : VM Ubuntu (OrbStack), Intel Core i5-8210Y @ 1.60GHz, 3 cœurs
+Python    : 3.14.4
+Date      : 19/10/2026
+
+Temps retenu : "Temps d'analyse" affiché par le programme
+(lecture du fichier + analyse ; le `real` de `time` ajoute ~0,2 s de démarrage de Python).
+
+Essai 1 : 53,540 s   (rapport de référence : resultats/rapport_seq.txt)
+Essai 2 : 61,662 s
+Essai 3 : 59,849 s
+----------------------
+Médiane : 59,849 s
+
+Contrôle : les 3 rapports sont identiques hors ligne du temps
+    diff <(sed '$d' resultats/rapport_seq.txt) <(sed '$d' essaiN.txt)   -> aucune différence
+
+Les écarts entre essais (53 à 62 s) viennent de la machine (charge de l'hôte,
+cache disque) : on retient donc la médiane.
