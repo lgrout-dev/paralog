@@ -1,3 +1,8 @@
 access.log
 __pycache__/
 COMPREHENSION.md
+# Rapports horodatés de scripts/lancer.sh (A4) : non versionnés
+resultats/rapport_[0-9]*.txt
+
+# Archives de scripts/archiver.sh (A8) : réservées au propriétaire, non versionnées
+archives/*.tar.gz

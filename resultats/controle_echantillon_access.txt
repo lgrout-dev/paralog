@@ -1,0 +1,25 @@
+=== Contrôle ParaLog (cut | sort | uniq -c) ===
+Journal contrôlé : data/echantillon_access.log
+Lignes du fichier :   100000
+
+--- 1. Requêtes par code HTTP (nombre, code) ---
+81042 200
+1903 301
+1888 302
+5915 304
+ 947 403
+6365 404
+1460 500
+ 480 503
+
+--- 2. Top 10 des adresses IP (nombre, IP) ---
+4029 10.42.213.80
+2416 172.16.180.171
+1747 10.42.221.253
+1601 203.0.113.66
+1386 10.42.69.104
+1121 192.168.1.39
+ 964 10.42.111.28
+ 852 172.16.121.79
+ 791 10.20.209.98
+ 734 192.0.2.218
