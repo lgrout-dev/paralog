@@ -1,0 +1,27 @@
+=== Limites de la version parallèle (P7) — data/access.log ===
+Fichier : 9000000 lignes, 1855.7 Mo ; cœurs logiques vus par Python : 4
+
+1. Lecture du disque (processus principal, sans analyse)
+   lecture seule (morceaux de 16 Mo)      :   26.611 s  (70 Mo/s)
+   lecture + décodage + découpage lignes  :   16.920 s
+
+2 à 4. Phases de P2 selon N (temps en secondes)
+  N  Pool vide  découpage  phase par.  worker max  surcoût   fusion    total  CPU total   renvoyé  non par.
+  1      0.450      0.002      36.814      36.657    0.158    0.000   36.817     33.254     116ko      0.4%
+  2      0.251      0.003      21.242      21.079    0.163    0.002   21.247     40.320     228ko      0.8%
+  4      0.363      0.003      34.255      33.976    0.279    0.007   34.265     82.925     448ko      0.8%
+  8      0.526      0.008      29.494      28.863    0.630    0.016   29.518     84.974     887ko      2.2%
+
+3. Détail par worker : temps écoulé (horloge) et temps de calcul (CPU)
+   N = 1 : 36.66/33.25
+   N = 2 : 21.08/20.24, 20.77/20.08
+   N = 4 : 33.98/20.69, 33.74/20.71, 33.97/20.80, 33.75/20.72
+   N = 8 : 28.55/10.73, 27.81/10.37, 28.86/10.65, 28.72/10.69, 28.66/10.74, 28.31/10.58, 28.84/10.66, 28.45/10.57
+
+Légende :
+  Pool vide  : créer N workers, leur donner une tâche vide, les arrêter (coût fixe)
+  phase par. : Pool + analyse des blocs + renvoi des résultats ; worker max = bloc le plus long
+  surcoût    : phase par. - worker max (démarrage, envoi, pickle des résultats, arrêt)
+  CPU total  : somme des temps de calcul des workers (augmente si les cœurs sont partagés)
+  renvoyé    : taille des résultats sérialisés (pickle) recopiés vers le principal
+  non par.   : (découpage + surcoût + fusion) / total
