@@ -6,3 +6,8 @@ resultats/rapport_[0-9]*.txt
 
 # Archives de scripts/archiver.sh (A8) : réservées au propriétaire, non versionnées
 archives/*.tar.gz
+
+# Dossier d'architecture (source, PDF, script de génération) : non versionnés
+docs/dossier_architecture.html
+docs/dossier_architecture.pdf
+scripts/generer_pdf.sh
