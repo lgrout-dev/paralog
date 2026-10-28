@@ -24,8 +24,10 @@ Ce document est **versionné** depuis le 28/10 (commit `59fbaf6`, retiré du `.g
 11. [P7 — Analyse des limites](#11-p7--analyse-des-limites)
 12. [Rapport de performance (PDF)](#12-rapport-de-performance-pdf)
 13. [P8 — Processus ou threads ?](#13-p8--processus-ou-threads-)
-14. [Prochaines étapes](#14-prochaines-étapes)
-15. [Journal des modifications](#journal-des-modifications)
+14. [A9 — Observation du système](#14-a9--observation-du-système)
+15. [P10 — Producteur / consommateur](#15-p10--producteur--consommateur)
+16. [Prochaines étapes](#16-prochaines-étapes)
+17. [Journal des modifications](#journal-des-modifications)
 
 ---
 
@@ -45,6 +47,8 @@ Le projet se déroule en deux étapes :
 | **A6** | Schéma en couches avec au moins deux appels système. | Fait le 27/10 : `docs/schema_A6.md` + `.svg`, appels relevés avec `strace` par `scripts/tracer_appels.sh` (voir [section 9](#9-a6--schéma-en-couches-et-appels-système)) |
 | **P7** | Expliquer pourquoi le gain n'est pas proportionnel à N (cœurs, création des processus, disque, partie non parallélisable). | Fait le 27/10 : `docs/limites_P7.md` + mesure de chaque cause par `scripts/mesurer_limites.py` → `resultats/limites_access.txt` (voir [section 11](#11-p7--analyse-des-limites)) |
 | **P8** (Attendu) | Mesurer la même analyse avec des threads puis avec des processus, expliquer l'écart. | Fait le 28/10 sur le PC (Ryzen 8 cœurs, WSL) : `src/analyse_threads.py`, `scripts/mesurer_p8.sh`, `docs/threads_P8.md`. 8 threads : x0,84, 0,97 cœur occupé (GIL) ; 8 processus : x4,34, 7,09 cœurs (voir [section 13](#13-p8--processus-ou-threads-)). Mesure Mac à faire |
+| **A9** (Bonus) | Relever les processus (PID, état, cœur) avec `ps` / `top` pendant une exécution, et commenter. | Fait le 28/10 sur le PC Intel (WSL) : `scripts/observer.sh`, `docs/observation_A9.md`, `resultats/observation_access_N4.txt` (voir [section 14](#14-a9--observation-du-système)). À reporter dans le PDF du dossier |
+| **P10** (Bonus) | Producteur / consommateur avec file bornée, temps comparés à P2. | Fait le 28/10 sur le PC Intel (WSL) : `src/analyse_prodcons.py`, `scripts/mesurer_p10.sh`, `docs/prodcons_P10.md`. P10 ≈ 14 % plus lent que P2 à N égal (8 : x4,34 contre x4,96) (voir [section 15](#15-p10--producteur--consommateur)). À reporter dans le PDF du rapport |
 | **Dossier d'architecture** | Livrable PDF (10 pages max) : arborescence commentée (A1), schéma (A6), droits (A3), mode d'emploi des scripts. | Fait le 27/10 : `docs/dossier_architecture.pdf` (10 pages depuis l'ajout de `mesurer_limites.py`), source `.html`, produit par `scripts/generer_pdf.sh` (voir [section 10](#10-dossier-darchitecture-pdf)). Page de garde à compléter |
 | **Rapport de performance** | Livrable PDF (6 pages max) : code, test, tableau et graphique des temps, analyse (P1 à P10). | Fait le 27/10 : `docs/rapport_performance.pdf` (6 pages), source `.html`, `bash scripts/generer_pdf.sh rapport_performance` (voir [section 12](#12-rapport-de-performance-pdf)). Page de garde à compléter |
 
@@ -77,6 +81,8 @@ paralog/
 │   ├── mesurer_limites.py       décompose le temps de P2 cause par cause (P7)
 │   ├── mesurer_p8.sh            threads vs processus (N = 1, 2, 4, 8), 3 essais, cœurs occupés (P8)
 │   ├── tracer_appels.sh         relevé strace des appels système du schéma (A6, Linux)
+│   ├── observer.sh              photos ps (PID, état, cœur) pendant une exécution de P2 (A9, Linux)
+│   ├── mesurer_p10.sh           seq + P2 + P10 (N = 1, 2, 4, 8), 3 essais, P10 ÷ P2 (P10)
 │   └── generer_pdf.sh [NOM]     imprime un livrable en PDF (Chrome headless) : dossier d'architecture
 │                                par défaut, ou rapport_performance ; NON versionné
 ├── src/
@@ -84,7 +90,8 @@ paralog/
 │   ├── rapport.py               mise en forme du rapport (partagé P1 / P2)
 │   ├── analyse_seq.py           programme principal P1
 │   ├── analyse_par.py           programme principal P2 (parallèle, processus)
-│   └── analyse_threads.py       même analyse avec des threads (P8), réutilise P2
+│   ├── analyse_threads.py       même analyse avec des threads (P8), réutilise P2
+│   └── analyse_prodcons.py      variante producteur / consommateur, file bornée (P10)
 ├── docs/
 │   ├── COMPREHENSION.md         ce document (versionné depuis le 28/10)
 │   ├── dossier_architecture.html   source du dossier d'architecture (NON versionné)
@@ -94,8 +101,10 @@ paralog/
 │   ├── concurrence_P4_P5.md     rédaction P4 / P5 pour le rapport de performance (versionné)
 │   ├── limites_P7.md            rédaction P7 (limites de l'accélération) pour le rapport de performance (versionné)
 │   ├── threads_P8.md            rédaction P8 (threads vs processus, GIL) pour le rapport de performance (versionné)
+│   ├── prodcons_P10.md          rédaction P10 (producteur / consommateur vs P2) pour le rapport de performance (versionné)
 │   ├── droits_A3.md             groupe, tableau des droits, preuve (dossier d'architecture, versionné)
 │   ├── schema_A6.md             schéma en couches + appels système relevés (versionné)
+│   ├── observation_A9.md        relevé ps commenté (A9, pour le dossier d'architecture, versionné)
 │   └── schema_A6.svg            le même schéma dessiné, pour le PDF (versionné)
 ├── resultats/                   rapports et mesures de temps
 │   ├── rapport_seq.txt          rapport P1 de référence (access.log)
@@ -105,7 +114,9 @@ paralog/
 │   ├── mesures_p2_access.txt/.csv   mesures P6 : P1 + P2 (N = 1, 2, 4, 8), 3 essais, médianes, accélération
 │   ├── graphique_p2_access.svg  graphique P6 (temps médian + accélération selon N)
 │   ├── limites_access.txt       sortie de mesurer_limites.py sur access.log (P7)
-│   └── mesures_p8_access_linux.txt/.csv   mesures P8 sur le PC (WSL) ; _macos.* pour le Mac
+│   ├── mesures_p8_access_linux.txt/.csv   mesures P8 sur le PC (WSL) ; _macos.* pour le Mac
+│   ├── mesures_p10_access_linux.txt/.csv  mesures P10 (seq + P2 + P10) sur le PC Intel (WSL)
+│   └── observation_access_N4.txt, observation_echantillon_access_N4.txt   relevés ps de observer.sh (A9)
 └── archives/                    archives de archiver.sh (700, NON versionnées)
 ```
 
@@ -749,6 +760,8 @@ Les temps affichés sous `strace` ne sont pas des mesures (chaque appel est inte
 | 7–9 | 5. Mode d'emploi : récapitulatif des 12 scripts, fiches A2, A4, A5, A7, A8 avec sorties réelles, scénario de démo |
 | 9 | 6. Limites, A9 non réalisé, encadré « Usage d'un outil d'IA » (obligatoire d'après les règles du sujet) |
 
+**Depuis le 28/10, A9 est fait** (voir [section 14](#14-a9--observation-du-système)) : les pages 2 et 9 du PDF (« A9 non réalisé ») sont à mettre à jour sur le Mac (voir [prochaines étapes](#16-prochaines-étapes), point 11).
+
 ### 10.3 Choix techniques (à savoir expliquer)
 
 - **Source HTML + Chrome headless (`--print-to-pdf`)** : pas de pandoc ni de bibliothèque Python de PDF (bibliothèque standard uniquement). Le SVG du schéma est inclus tel quel, donc **vectoriel** (net au zoom). La source est un fichier texte versionné : un coéquipier peut la corriger et régénérer.
@@ -857,6 +870,8 @@ python3 scripts/mesurer_limites.py data/access.log > resultats/limites_access.tx
 | 5 | 6. P7 : tableau de décomposition, les 4 causes, Amdahl, synthèse |
 | 6 | 7. P9 : règle des lignes mal formées, fichier de test (1 analysée, 5 ignorées), erreurs réelles et codes de retour ; 8. Limites (P8 / P10 non réalisés, N par défaut, NFS, une seule exécution P7, worker tué) ; encadré « Usage d'un outil d'IA » |
 
+**Depuis le 28/10, P8 et P10 sont faits** (sections 13 et 15) : les pages 2 et 6 du PDF (« P8 et P10 Non réalisé ») sont à mettre à jour sur le Mac (voir [prochaines étapes](#16-prochaines-étapes), points 9 et 13).
+
 ### 12.3 Choix techniques (à savoir expliquer)
 
 - **Même méthode que le dossier d'architecture** (source HTML + Chrome headless) et même CSS : les deux livrables se ressemblent.
@@ -898,6 +913,8 @@ bash scripts/generer_pdf.sh                       # -> docs/dossier_architecture
 (AMD Ryzen 7 5800H, **8 cœurs physiques / 16 logiques**, Python 3.12.3, dépôt sur le disque ext4 de WSL).
 P6 et P7 ont été mesurées sur le Mac (2 cœurs) : les chiffres de P8 se comparent entre eux, pas avec P6.
 Les sources HTML / PDF des livrables et `generer_pdf.sh` (non versionnés) sont restés sur le Mac.
+
+**Autre PC (A9 et P10, 28/10 après-midi) :** le relevé A9 et les mesures P10 ont été faits sur un autre PC Windows + WSL2, **Intel Core Ultra 9 185H** (11 cœurs physiques / 22 logiques vus par Linux). Ses chiffres ne se comparent pas à ceux de P8 (voir [section 14](#14-a9--observation-du-système)).
 
 ### 13.2 `src/analyse_threads.py` — la même analyse avec des threads
 
@@ -969,7 +986,137 @@ bash scripts/mesurer_p8.sh data/access.log                        # mesure offic
 
 ---
 
-## 14. Prochaines étapes
+## 14. A9 — Observation du système
+
+### 14.1 Ce qui était demandé
+
+| # | Demande (sujet) | Fait | Où |
+| --- | --- | --- | --- |
+| A9 (Bonus) | Pendant une exécution, relever les processus créés (PID, état, cœur utilisé) avec `ps`, `top` ou `htop`, et commenter ce relevé dans le dossier | ✅ relevé sur `access.log` (PC Intel, WSL) + commentaire ; à reporter dans le PDF du dossier (sur le Mac) | `scripts/observer.sh`, `docs/observation_A9.md`, `resultats/observation_access_N4.txt` |
+
+**Machine :** PC portable **Intel Core Ultra 9 185H**, WSL2, Python 3.12.3. Linux y voit 11 cœurs physiques × 2 = 22 logiques
+(`2k` et `2k+1` = même cœur physique `k`, `lscpu -p=CPU,Core`) ; topologie présentée par l'hyperviseur, la vraie puce mélange
+cœurs P et E. **Ce n'est pas le PC de P8** (Ryzen 7 5800H) ni le Mac de P6 / P7.
+
+### 14.2 `scripts/observer.sh [JOURNAL] [N] [INTERVALLE]`
+
+- Par défaut : échantillon, N = 4, une photo toutes les 0,2 s. Sur l'échantillon (analyse < 0,1 s), il faut `0.01`.
+- Lance `analyse_par.py` en arrière-plan (`&`) ; tant qu'il existe (`kill -0`), photo `ps -e -o pid=,ppid=,stat=,psr=,pcpu=,nlwp=,args=`.
+- **Garder le bon arbre :** `awk` part du PID lancé et ajoute les processus dont le parent est déjà gardé, jusqu'à ce qu'il n'y en ait plus.
+  Marche en `fork` (Python 3.12 : workers enfants du principal) comme en `forkserver` (≥ 3.14 : workers enfants du forkserver).
+- **Rôle :** PID lancé = principal ; `resource_tracker` / `forkserver` reconnus dans la commande ; le reste = worker.
+- **Temps `t` lu dans `/proc/uptime`** : horloge monotone (pas de saut WSL, voir P8), et aucun processus lancé pour la lire.
+- Résumé final : états et cœurs vus par processus. Relevé dans `resultats/observation_NOM_NN.txt`, en 640 (`umask 027`).
+- Codes : 0 = OK ; 1 = fichier absent / dossier, `ps` sans `psr` (macOS), analyse en échec ou finie avant la 1re photo ;
+  2 = trop d'arguments, N invalide, INTERVALLE pas un nombre > 0.
+- **Pourquoi `ps` :** donne directement PID, état et cœur, une ligne par processus, facile à filtrer et à rediriger ; `htop` absent.
+
+### 14.3 Ce qu'il faut savoir expliquer (relevé `access.log`, N = 4, 24 photos, 4,96 s)
+
+- **Arbre :** 1 principal + 4 workers (PPID = principal, `fork`). Photo 1 : principal seul, 1 thread (`calculer_blocs`).
+- **Workers en `R`, `%CPU` 89 → 98 %** : calcul pur, un cœur chacun. **Principal en `Sl`, `%CPU` → 0** : il attend dans `starmap`,
+  ne lit rien, ne touche à rien (P4 vu par le système). `NLWP` = 4 : lui + **3 threads du `Pool`** (les `clone3` de A6).
+- **Un seul `D`** sur 92 photos de workers : attente disque probable (fichier presque tout en cache). Photo 24 : 2 workers en `S`
+  (bloc fini) → fins presque simultanées = blocs équilibrés.
+- **`%CPU` de `ps` = moyenne** sur la vie du processus, pas instantané (question piège).
+- **Cœurs :** toujours 4 cœurs **physiques** différents (4, 1, 3, 10) → vrai parallélisme (contraire des threads + GIL de P8).
+  Chaque changement de cœur (8 → 9, 2 → 3, 6 → 7, 20 → 21) reste **sur le même cœur physique** : l'ordonnanceur garde le cache.
+  Les cœurs sont choisis par le noyau (aucune affinité fixée).
+- **Limites :** une photo / 0,2 s (états courts manqués), `ps` consomme un peu, une seule exécution, numéros de cœurs vus par WSL.
+
+### 14.4 Vérifications (28/10, PC Intel WSL)
+
+| Vérification | Résultat |
+| --- | --- |
+| Échantillon, N = 4, intervalle 0,2 s | 1 seule photo (analyse 0,085 s) → ajout de l'argument INTERVALLE |
+| Échantillon, N = 4, intervalle 0,01 s | 6 photos, principal + 4 workers sur 4 cœurs, code 0 ✅ |
+| 4 arguments / absent / dossier / N = `0`, `abc` / INTERVALLE = `0`, `abc`, `1.2.3`, `.`, `-1` | Codes 2 / 1 / 1 / 2 / 2 ✅ |
+| Lancé depuis `/` | Code 0 ✅ |
+| Copie du dépôt avec `set_start_method("forkserver")` | Rôles `forkserver`, `resource_tracker`, workers enfants du forkserver ✅ |
+| Droits du relevé | 640 ✅ |
+| `access.log`, N = 4 (lancé par Louis) | Code 0, 24 photos ; extraits de `observation_A9.md` identiques au relevé (`grep -xF`) ✅ |
+
+### 14.5 Comment lancer
+
+```bash
+bash scripts/observer.sh data/access.log 4                     # relevé officiel (~5 s sur le PC Intel)
+bash scripts/observer.sh data/echantillon_access.log 4 0.01     # essai rapide
+```
+
+---
+
+## 15. P10 — Producteur / consommateur
+
+### 15.1 Ce qui était demandé
+
+| # | Demande (sujet) | Fait | Où |
+| --- | --- | --- | --- |
+| P10 (Bonus) | Une variante où un producteur lit le fichier et alimente une file bornée, consommée par N workers ; comparer ses temps à ceux de P2 | ✅ mesuré sur `access.log` (PC Intel, WSL), P2 dans la même session ; à reporter dans le PDF du rapport (sur le Mac) | `src/analyse_prodcons.py`, `scripts/mesurer_p10.sh`, `docs/prodcons_P10.md`, `resultats/mesures_p10_access_linux.txt/.csv` |
+
+### 15.2 `src/analyse_prodcons.py JOURNAL [N]`
+
+- **Producteur = processus principal** : lit le fichier par lots de 1 Mo (`TAILLE_LOT`), prolongés jusqu'au `\n` (`readline()`),
+  et les dépose en `bytes` dans `Queue(maxsize=2 * n)` : la **file bornée**. `put()` attend si elle est pleine → au plus 2N Mo d'avance.
+- **N consommateurs** (`Process`) : `lignes_des_lots()` retire les lots (`get()` attend si la file est vide), décode et découpe comme P2,
+  et passe le tout à `analyser_lignes()` (même fonction que P1 / P2). Chacun renvoie **un** résultat dans une 2e file.
+- **Fin :** un marqueur `None` par consommateur ; le principal lit les N résultats **puis** fait `join()`.
+- Même interface, messages, codes et chronomètre que P2 ; `lire_nombre_workers` importé de P2.
+- **Pourquoi des lots en `bytes` (choix de Louis) :** envoyer un `bytes` = une simple copie ; des listes de chaînes coûteraient
+  beaucoup plus à sérialiser, et le décodage serait fait par le seul producteur.
+- **Pourquoi 2 × N (choix de Louis) :** chaque consommateur a environ un lot d'avance pendant qu'il travaille ; mémoire bornée.
+- **Pourquoi ouvrir le fichier avant de créer les consommateurs :** fichier absent → code 1 tout de suite, aucun consommateur bloqué sur `get()`.
+
+### 15.3 `scripts/mesurer_p10.sh JOURNAL [ESSAIS]`
+
+Copie adaptée de `mesurer_p8.sh` (même méthode : essais entrelacés, horloge monotone, cœurs occupés, `diff` de chaque rapport),
+versions `seq`, `p1 p2 p4 p8` (P2), `c1 c2 c4 c8` (P10), plus un tableau **P10 ÷ P2 à N égal**. Sortie `resultats/mesures_p10_NOM_SYS.*`.
+
+### 15.4 Résultats (`access.log`, PC Intel WSL, 28/10/2026 17:32, médianes de 3 essais)
+
+| N | P2 | P10 | P10 ÷ P2 | sys P2 / P10 |
+| --- | --- | --- | --- | --- |
+| séquentiel | 14,208 s | | | 0,29 s |
+| 1 | 14,975 s (x0,95) | 17,205 s (x0,83) | x1,15 | 0,53 / 3,21 s |
+| 2 | 7,721 s (x1,84) | 8,826 s (x1,61) | x1,14 | 0,75 / 2,77 s |
+| 4 | 4,210 s (x3,37) | 4,715 s (x3,01) | x1,12 | 1,09 / 3,10 s |
+| 8 | 2,862 s (**x4,96**) | 3,275 s (**x4,34**) | x1,14 | 2,03 / 3,18 s |
+
+### 15.5 Ce qu'il faut savoir expliquer
+
+- **P10 ≈ 14 % plus lent à N égal :** les 1,86 Go passent par le tube de la file (écrits par le producteur, relus par un consommateur) :
+  copies en plus dans le noyau → **sys ≈ 3 s quel que soit N**. Surcoût fixe (le volume copié ne dépend pas de N) → rapport constant.
+- **Producteur pas encore goulot à N = 8** (≈ 570 Mo/s depuis le cache, environ 1 s de CPU : estimation). Il le deviendrait avec beaucoup
+  plus de consommateurs ou un disque lent : la partie non parallélisable propre à P10 (Amdahl). Hypothèse non mesurée.
+- **Quand P10 gagne :** flux sans `seek` (stdin, `tail -f`, `.gz`, réseau), mémoire bornée, équilibrage automatique (cœurs P / E).
+- **P4 / P5 :** la file est **une vraie donnée partagée**, protégée par `Queue` : `_rlock` (lecture), `_wlock` (écriture),
+  `BoundedSemaphore(2N)` (places libres), vérifié dans `multiprocessing/queues.py`. Un thread interne (*feeder*) écrit dans le tube.
+- **Piège `join()` avant `get()` :** un processus attend que son *feeder* ait tout écrit avant de se terminer ; si personne ne lit,
+  principal et consommateur s'attendent mutuellement = **cycle** (Coffman 4). Évité : résultats lus d'abord. Autres attentes sans fin :
+  marqueur oublié (évité), consommateur tué (non traité, comme P2).
+
+### 15.6 Vérifications (28/10, PC Intel WSL)
+
+| Vérification | Résultat |
+| --- | --- |
+| Échantillon, N = 1, 2, 4, 8 : `diff` avec P1 | IDENTIQUE ✅ |
+| Lots forcés à 1 000 octets (copie), N = 1, 3, 8 | IDENTIQUE ✅ |
+| Fichier vide ; fichier de 11 lignes (6 mal formées, octet invalide, dernière ligne sans `\n`) | IDENTIQUE ; 5 analysées, 6 ignorées ✅ |
+| Sans argument / 3 arguments / absent / dossier / N = `0`, `-3`, `abc` / depuis `/` | Codes 2 / 2 / 1 / 1 / 2 / 2 / 2 / 0 ✅ |
+| Copie en mode `forkserver` (Python ≥ 3.14) | IDENTIQUE ✅ |
+| `mesurer_p10.sh` échantillon (1 essai) ; erreurs (sans arg, 3 args, absent, dossier, illisible, ESSAIS `0` / `abc`) ; depuis `/` | Code 0 ; codes 2 / 2 / 1 / 1 / 1 / 2 / 2 ; code 0 ✅ (fichiers d'essai supprimés) |
+| `access.log` (lancé par Louis) | 27 rapports identiques au séquentiel, code 0 ✅ |
+| Chiffres de `prodcons_P10.md` recalculés depuis le `.csv` | Cohérents ✅ |
+
+### 15.7 Comment lancer
+
+```bash
+python3 src/analyse_prodcons.py data/echantillon_access.log 4     # rapport avec 4 consommateurs
+bash scripts/mesurer_p10.sh data/access.log                        # mesure officielle (~6 min sur le PC Intel)
+```
+
+---
+
+## 16. Prochaines étapes
 
 Point d'avancement n°3 le **mercredi 28 octobre** (toutes les fonctionnalités « Indispensable » démontrées), dépôt le **jeudi 29 à 12h30**.
 
@@ -986,7 +1133,19 @@ Point d'avancement n°3 le **mercredi 28 octobre** (toutes les fonctionnalités 
    - dans `docs/rapport_performance.html` (sur le Mac) : P8 « Non réalisé » → « Fait », ajouter un résumé de `threads_P8.md` (tableau + GIL), en condensant pour rester à **6 pages**, puis `bash scripts/generer_pdf.sh rapport_performance` ; ajouter `analyse_threads.py` et `mesurer_p8.sh` à l'arborescence du dossier d'architecture (attention, déjà à 10 pages) ;
    - relancer `bash scripts/installer.sh` (droits et groupe des nouveaux fichiers).
 10. **Prochaine étape : gestion de projet** G1 à G6 (dossier PDF, 12 pages max, **Indispensable**) : note de cadrage, backlog / WBS / RACI, PERT et Gantt, registre des risques, Kanban et comptes rendus des 3 points, REX.
-11. Bonus si le temps le permet : A9 (relevé `ps` / `top` pendant une exécution ; `ps -o pid,nlwp` déjà utilisé pour P8), P10 (producteur / consommateur), G9 (éthique et sobriété).
+11. ~~A9 (Bonus)~~ : fait le 28/10 sur le PC Intel WSL (voir section 14). **À faire par Louis :**
+   - relancer `bash scripts/installer.sh` (met `observer.sh` en 750 et les nouveaux fichiers au groupe `paralog`) ;
+   - dans `docs/dossier_architecture.html` (sur le Mac) : A9 « non réalisé » → « fait », ajouter `observer.sh` au récapitulatif
+     des scripts et à l'arborescence, et un résumé de `observation_A9.md` (résumé par processus + 3 groupes de puces : états,
+     threads du Pool, cœurs). **Le PDF est déjà à 10 pages** : condenser ailleurs (par ex. sorties réelles du mode d'emploi), puis `bash scripts/generer_pdf.sh`.
+12. **Prochaine étape : gestion de projet** G1 à G6 (Indispensable, voir point 10), à terminer avant le dépôt du jeudi 29 à 12h30.
+13. ~~P10 (Bonus)~~ : fait le 28/10 sur le PC Intel WSL (voir section 15). **À faire par Louis :**
+   - relancer `bash scripts/installer.sh` (`mesurer_p10.sh` en 750 ; `mesures_p10_*` créés en 644 → 640) ;
+   - dans `docs/rapport_performance.html` (sur le Mac, en même temps que P8, point 9) : P10 « Non réalisé » → « Fait », résumé de
+     `prodcons_P10.md` (tableau P2 / P10 + 3 puces : copies dans le tube / sys, producteur pas encore goulot, file = donnée partagée et
+     piège `join()`). **Le PDF est à 6 pages** : condenser fortement, puis `bash scripts/generer_pdf.sh rapport_performance` ;
+     ajouter `analyse_prodcons.py`, `mesurer_p10.sh` et `prodcons_P10.md` à l'arborescence du dossier d'architecture.
+14. Bonus restant si le temps le permet : G9 (éthique et sobriété, une demi-page).
 
 ---
 
@@ -1016,3 +1175,6 @@ Point d'avancement n°3 le **mercredi 28 octobre** (toutes les fonctionnalités 
 | 2026-10-27 | P7 : création de `scripts/mesurer_limites.py` (décompose le temps de P2 : lecture disque, Pool vide, temps écoulé / CPU de chaque worker, découpage, surcoût, fusion, taille des résultats), de `resultats/limites_access.txt` (mesure sur `access.log`, Mac) et de `docs/limites_P7.md`. Conclusions : partie non parallélisable du code 0,4–2,2 % ; limites = 2 cœurs physiques (hyperthreading : CPU ×2 à N = 4), baisse de fréquence (+21 % CPU à N = 2), lecture à froid sur le partage NFS d'OrbStack (26,6 s). Nouvelle section 11 ; sommaire, sections 1, 2, 5.1, 6.5 et prochaines étapes (devenue section 12, prochaine : PDF du rapport de performance) mises à jour. |
 | 2026-10-27 | Rapport de performance : création de `docs/rapport_performance.html` et `.pdf` (6 pages : garde, couverture P1–P10, programme, P3, P6 avec tableau et graphique, P4, P5, P7, P9, limites, usage de l'IA). `scripts/generer_pdf.sh` généralisé (argument `NOM`, limite de pages par livrable). Dossier d'architecture : `mesurer_limites.py`, `limites_access.txt`, `limites_P7.md` et le rapport ajoutés (arbre + récapitulatif), 10 pages. `.gitignore` : source et PDF du rapport non versionnés. Nouvelle section 12 ; sommaire, sections 1, 2, 10.5 et prochaines étapes (devenue section 13, prochaine : gestion de projet) mises à jour. |
 | 2026-10-28 | P8 : création de `src/analyse_threads.py` (même analyse que P2 avec `ThreadPool`, fonctions importées de P2), `scripts/mesurer_p8.sh` (threads vs processus N = 1, 2, 4, 8, 3 essais, cœurs occupés = CPU ÷ réel, `diff` de chaque rapport) et `docs/threads_P8.md`. Mesure `access.log` sur le PC WSL (Ryzen 7 5800H, 8 cœurs) → `resultats/mesures_p8_access_linux.*` : 8 threads x0,84 / 0,97 cœur (GIL), 8 processus x4,34 / 7,09 cœurs. Saut d'horloge de WSL (−2,4 s) détecté et corrigé (temps réel sur l'horloge monotone), mesure relancée. Nouvelle section 13 ; sommaire, en-tête (document désormais versionné), sections 1, 2 et prochaines étapes (devenue section 14) mises à jour. |
+| 2026-10-28 | A9 : création de `scripts/observer.sh` (photos `ps` du principal et de ses descendants : PID, PPID, état, cœur, %CPU, threads ; résumé par processus ; argument INTERVALLE), de `docs/observation_A9.md` (relevé commenté) et des relevés `resultats/observation_access_N4.txt` (lancé par Louis, PC Intel Core Ultra 9 185H, WSL : 4 workers en `R` sur 4 cœurs physiques différents, principal en `Sl` avec 3 threads du Pool) et `observation_echantillon_access_N4.txt`. Nouvelle section 14 ; sommaire, sections 1, 2 et prochaines étapes (devenue section 15) mises à jour. |
+| 2026-10-28 | Relecture après A9 : note en 10.2 (pages 2 et 9 du PDF du dossier encore « A9 non réalisé », à mettre à jour sur le Mac) et en 13.1 (2e PC Intel Core Ultra 9 185H utilisé pour A9, à ne pas confondre avec le Ryzen de P8). |
+| 2026-10-28 | P10 : création de `src/analyse_prodcons.py` (producteur = principal, lots de 1 Mo en `bytes` recalés sur `\n`, `Queue(maxsize=2N)`, N consommateurs `Process`, marqueurs `None`, résultats lus avant `join()`), `scripts/mesurer_p10.sh` (seq + P2 + P10, N = 1, 2, 4, 8, 3 essais, P10 ÷ P2) et `docs/prodcons_P10.md`. Mesure `access.log` (lancée par Louis, PC Intel Core Ultra 9 185H) → `resultats/mesures_p10_access_linux.*` : P10 ≈ 14 % plus lent que P2 à N égal (8 : x4,34 contre x4,96), sys ≈ 3 s (copies dans le tube). Nouvelle section 15 ; sommaire, sections 1, 2, 12.2, 13.1 et prochaines étapes (devenue section 16) mises à jour. |
