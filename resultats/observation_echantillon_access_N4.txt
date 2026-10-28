@@ -1,0 +1,44 @@
+=== Observation du système pendant une exécution de P2 (A9) ===
+Commande   : python3 src/analyse_par.py data/echantillon_access.log 4
+Date       : 28/10/2026 17:08:31
+Machine    : Intel(R) Core(TM) Ultra 9 185H, 11 cœurs physiques, 22 cœurs logiques (numérotés 0 à 21)
+Python     : Python 3.12.3
+Photos     : 6, intervalle demandé 0.01 s (ps lui-même prend un peu de temps) ; Temps d'analyse : 0.080 s
+
+Colonnes : PPID = parent ; STAT = état (R en cours d'exécution, S endormi en attente,
+D attente disque, Z zombie, l = a plusieurs threads, s = chef de session, + = premier plan) ;
+PSR = cœur utilisé ; %CPU = temps CPU ÷ durée de vie (moyenne, pas instantané) ; NLWP = threads.
+
+  RÔLE                PID    PPID  STAT  PSR  %CPU NLWP
+--- photo 1, t = 0.00 s
+  principal          18347   18339  R       8   0.0    1
+--- photo 2, t = 0.02 s
+  principal          18347   18339  R       8   100    1
+--- photo 3, t = 0.03 s
+  principal          18347   18339  Sl      8  50.0    4
+  worker             18363   18347  R       1   0.0    1
+  worker             18364   18347  R       3   0.0    1
+  worker             18365   18347  R      21   100    1
+  worker             18366   18347  R      12   0.0    1
+--- photo 4, t = 0.05 s
+  principal          18347   18339  Sl      8  33.3    4
+  worker             18363   18347  R       1  50.0    1
+  worker             18364   18347  R       3  75.0    1
+  worker             18365   18347  R      21   100    1
+  worker             18366   18347  R      13   100    1
+--- photo 5, t = 0.08 s
+  principal          18347   18339  Sl      8  37.5    4
+  worker             18363   18347  S       1  66.6    1
+  worker             18364   18347  R       3  83.3    1
+  worker             18365   18347  R      21   100    1
+  worker             18366   18347  R      13   100    1
+--- photo 6, t = 0.10 s
+  principal          18347   18339  R       8  30.0    1
+
+=== Résumé par processus (états et cœurs vus sur l'ensemble des photos) ===
+  RÔLE                 PID  PHOTOS  ÉTATS    CŒURS
+  principal          18347       6  R S      8
+  worker             18363       3  R S      1
+  worker             18364       3  R        3
+  worker             18365       3  R        21
+  worker             18366       3  R        12 13
