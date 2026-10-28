@@ -1,0 +1,30 @@
+=== Mesures de performance ParaLog — P10 (producteur / consommateur comparé à P2) ===
+
+Journal    : data/access.log (9000000 lignes)
+Machine    : Intel(R) Core(TM) Ultra 9 185H, 11 cœurs physiques, 22 cœurs logiques
+Système    : Linux 6.6.87.2-microsoft-standard-WSL2
+Python     : Python 3.12.3
+Date       : 28/10/2026 17:32
+Essais     : 3 par version, entrelacés ; rapports tous identiques au séquentiel (hors temps)
+
+Version        Temps des essais (s)        Médiane Accélération  Cœurs occupés
+séquentiel     15.036 13.812 14.208          14.208         x1.00             1.00
+P2, 1 w.       15.306 14.180 14.975          14.975         x0.95             1.00
+P2, 2 w.       7.918 7.476 7.721              7.721         x1.84             1.96
+P2, 4 w.       4.210 3.980 4.277              4.210         x3.37             3.89
+P2, 8 w.       2.862 2.842 3.179              2.862         x4.96             7.21
+P10, 1 c.      17.781 16.729 17.205          17.205         x0.83             1.05
+P10, 2 c.      8.897 8.682 8.826              8.826         x1.61             2.07
+P10, 4 c.      4.715 4.642 5.173              4.715         x3.01             4.01
+P10, 8 c.      3.455 3.226 3.275              3.275         x4.34             6.82
+
+Accélération  = médiane séquentielle ÷ médiane de la version.
+Cœurs occupés = temps CPU (user + sys) ÷ temps réel de la commande (médiane des essais) :
+                1 = un seul cœur calcule à la fois ; N = N cœurs calculent en même temps.
+w. = workers (P2, chaque worker lit son bloc) ; c. = consommateurs (P10, + 1 producteur qui lit tout).
+
+Comparaison à N égal : P10 ÷ P2 (> 1 : P10 plus lent que P2)
+  N = 1 : x1.15
+  N = 2 : x1.14
+  N = 4 : x1.12
+  N = 8 : x1.14
