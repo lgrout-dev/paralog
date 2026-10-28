@@ -2,16 +2,27 @@
 
 Ce kit contient tout ce qu'il faut pour démarrer le projet sur votre propre machine (Linux ou Windows avec WSL).
 
+Toutes les commandes ci-dessous se lancent **depuis la racine du dépôt**.
+
+| Dossier | Contenu |
+| --- | --- |
+| `src/` | Code de l'outil d'analyse (versions séquentielle et parallèle) |
+| `scripts/` | Scripts utilitaires du kit |
+| `data/` | Journaux à analyser |
+| `resultats/` | Sorties et mesures de performance |
+| `docs/` | Documentation du projet |
+| `archives/` | Anciennes versions, livrables archivés |
+
 | Fichier | Rôle |
 | --- | --- |
-| `verifier_environnement.sh` | Vérifie que votre machine a bash, Python 3.8+, Git, les commandes du cours, assez de cœurs et d'espace disque |
-| `generer_logs.py` | Génère le journal du projet (`access.log`, environ 2 Go) |
-| `echantillon_access.log` | Extrait de 100 000 lignes (environ 20 Mo) pour développer et tester vite |
+| `scripts/verifier_environnement.sh` | Vérifie que votre machine a bash, Python 3.8+, Git, les commandes du cours, assez de cœurs et d'espace disque |
+| `scripts/generer_logs.py` | Génère le journal du projet (`data/access.log`, environ 2 Go) |
+| `data/echantillon_access.log` | Extrait de 100 000 lignes (environ 20 Mo) pour développer et tester vite |
 
 ## 1. Vérifier votre machine (5 minutes)
 
 ```bash
-bash verifier_environnement.sh
+bash scripts/verifier_environnement.sh
 ```
 
 Corrigez chaque ligne `[KO]` avant le premier jour de réalisation. Sous WSL / Ubuntu : `sudo apt install python3 git`.
@@ -19,12 +30,12 @@ Corrigez chaque ligne `[KO]` avant le premier jour de réalisation. Sous WSL / U
 ## 2. Générer le journal du projet (moins de 2 minutes)
 
 ```bash
-python3 generer_logs.py
+python3 scripts/generer_logs.py -o data/access.log
 ```
 
-Le script crée `access.log` (9 000 000 de lignes, environ 1,9 Go). **Toutes les équipes obtiennent exactement le même fichier** : la génération est reproductible. Ne modifiez pas la graine, sinon vos résultats ne pourront pas être comparés à ceux attendus.
+Le script crée `data/access.log` (9 000 000 de lignes, environ 1,9 Go). **Toutes les équipes obtiennent exactement le même fichier** : la génération est reproductible. Ne modifiez pas la graine, sinon vos résultats ne pourront pas être comparés à ceux attendus.
 
-Ne déposez **jamais** ce fichier sur Git : ajoutez `access.log` à votre `.gitignore`.
+Ne déposez **jamais** ce fichier sur Git : il est déjà exclu par le `.gitignore` du dépôt. N'oubliez pas l'option `-o data/access.log` : sans elle, le fichier est créé dans le dossier courant.
 
 ## 3. Le format d'une ligne
 
@@ -52,10 +63,10 @@ Pour l'ensemble du fichier :
 3. les 10 pages les plus demandées ;
 4. le nombre de requêtes par heure (de 00h à 23h).
 
-Commencez par l'échantillon : vos résultats sur `echantillon_access.log` doivent être identiques entre votre version séquentielle et votre version parallèle. Passez ensuite au fichier complet pour les mesures de performance.
+Commencez par l'échantillon : vos résultats sur `data/echantillon_access.log` doivent être identiques entre votre version séquentielle et votre version parallèle. Passez ensuite au fichier complet pour les mesures de performance.
 
 ## Conseils
 
-- Mesurez les temps avec `time python3 votre_programme.py access.log` et répétez chaque mesure 3 fois.
+- Mesurez les temps avec `time python3 src/votre_programme.py data/access.log` et répétez chaque mesure 3 fois.
 - Attention aux lignes coupées en deux quand vous découpez le fichier en blocs : chaque bloc doit commencer et finir sur une ligne complète.
 - Les adresses IP du journal appartiennent à des plages réservées (documentation ou réseaux privés) : elles ne correspondent à aucune personne réelle.

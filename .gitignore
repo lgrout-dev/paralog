@@ -1,1 +1,14 @@
 access.log
+__pycache__/
+# Rapports horodatés de scripts/lancer.sh (A4) : non versionnés
+resultats/rapport_[0-9]*.txt
+
+# Archives de scripts/archiver.sh (A8) : réservées au propriétaire, non versionnées
+archives/*.tar.gz
+
+# Dossier d'architecture et rapport de performance (sources, PDF, script de génération) : non versionnés
+docs/dossier_architecture.html
+docs/dossier_architecture.pdf
+docs/rapport_performance.html
+docs/rapport_performance.pdf
+scripts/generer_pdf.sh

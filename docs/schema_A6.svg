@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ParaLog (CESI, S3) — Schéma en couches (A6). Explications : docs/schema_A6.md -->
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="632" viewBox="0 0 900 632"
+     font-family="Helvetica, Arial, sans-serif" font-size="12.5" fill="#222">
+  <defs>
+    <marker id="fleche-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d9480f"/>
+    </marker>
+    <marker id="fleche-bleue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1c64b0"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="632" fill="#ffffff"/>
+
+  <!-- Titre -->
+  <text x="450" y="28" text-anchor="middle" font-size="17" font-weight="bold">ParaLog — schéma en couches (A6)</text>
+  <text x="450" y="48" text-anchor="middle" font-size="12" fill="#555">Appels système relevés avec strace -f (VM Ubuntu, Python 3.14, échantillon, 2 workers) : bash scripts/tracer_appels.sh</text>
+
+  <!-- Couches du mode utilisateur -->
+  <rect x="20" y="62" width="860" height="46" fill="#f1f3f5" stroke="#adb5bd"/>
+  <text x="34" y="90" font-weight="bold">Utilisateur</text>
+  <text x="196" y="80">membre du groupe paralog, dans un terminal</text>
+  <text x="196" y="99" font-family="Menlo, Consolas, monospace" font-size="12">$ bash scripts/lancer.sh data/echantillon_access.log 2</text>
+
+  <rect x="20" y="114" width="860" height="62" fill="#e7f5ff" stroke="#adb5bd"/>
+  <text x="34" y="142" font-weight="bold">Scripts Bash</text>
+  <text x="34" y="160" font-size="11" fill="#555">scripts/</text>
+  <text x="196" y="140">scripts/lancer.sh, interprété par /usr/bin/bash</text>
+  <text x="196" y="160">crée un fils, redirige &gt; vers le rapport, y lance python3</text>
+
+  <rect x="20" y="182" width="860" height="62" fill="#f1f3f5" stroke="#adb5bd"/>
+  <text x="34" y="210" font-weight="bold">Programme</text>
+  <text x="34" y="228" font-size="11" fill="#555">src/</text>
+  <text x="196" y="208">src/analyse_par.py + analyse_commun.py + rapport.py</text>
+  <text x="196" y="228">open() · seek() · read() du journal, Pool(N), print() du rapport</text>
+
+  <rect x="20" y="250" width="860" height="62" fill="#e7f5ff" stroke="#adb5bd"/>
+  <text x="34" y="278" font-weight="bold">Interpréteur</text>
+  <text x="34" y="296" font-weight="bold">Python</text>
+  <text x="196" y="276">/usr/bin/python3 (CPython 3.14) : modules io et multiprocessing</text>
+  <text x="196" y="296">forkserver → N workers (processus), 3 threads internes du Pool</text>
+
+  <rect x="20" y="318" width="860" height="46" fill="#f1f3f5" stroke="#adb5bd"/>
+  <text x="34" y="346" font-weight="bold">Bibliothèque C</text>
+  <text x="196" y="346">glibc : traduit open(), read(), fork()… en appels système</text>
+
+  <!-- Frontière mode utilisateur / mode noyau -->
+  <line x1="20" y1="372" x2="880" y2="372" stroke="#c92a2a" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <line x1="20" y1="412" x2="880" y2="412" stroke="#c92a2a" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="34" y="389" font-weight="bold" fill="#c92a2a">APPELS SYSTÈME</text>
+  <text x="34" y="405" font-size="11" fill="#c92a2a">↑ mode utilisateur  ·  ↓ mode noyau</text>
+  <text x="222" y="397" font-size="11.5" fill="#555">le noyau vérifie chaque demande, l'exécute, puis rend la main</text>
+
+  <!-- Couches du mode noyau -->
+  <rect x="20" y="418" width="860" height="86" fill="#fff4e6" stroke="#adb5bd"/>
+  <text x="34" y="446" font-weight="bold">Noyau Linux</text>
+  <text x="196" y="442">ordonnanceur : place chaque processus sur un cœur</text>
+  <text x="196" y="462">système de fichiers + cache disque · contrôle des droits (A3) à openat</text>
+  <text x="196" y="482">mémoire séparée pour chaque processus (workers créés sans CLONE_VM)</text>
+
+  <rect x="20" y="510" width="860" height="62" fill="#f1f3f5" stroke="#adb5bd"/>
+  <text x="34" y="538" font-weight="bold">Matériel</text>
+  <text x="196" y="536">Intel Core i5-8210Y : 2 cœurs physiques, 4 threads</text>
+  <text x="196" y="556">mémoire vive · disque SSD (data/access.log)</text>
+
+  <!-- Appels système : chaque flèche part de la couche qui les demande et entre dans le noyau -->
+  <circle cx="637" cy="145" r="4" fill="#d9480f"/>
+  <line x1="637" y1="145" x2="637" y2="416" stroke="#d9480f" stroke-width="2.5" marker-end="url(#fleche-orange)"/>
+  <circle cx="734" cy="213" r="4" fill="#1c64b0"/>
+  <line x1="734" y1="213" x2="734" y2="416" stroke="#1c64b0" stroke-width="2.5" marker-end="url(#fleche-bleue)"/>
+  <circle cx="831" cy="281" r="4" fill="#d9480f"/>
+  <line x1="831" y1="281" x2="831" y2="416" stroke="#d9480f" stroke-width="2.5" marker-end="url(#fleche-orange)"/>
+
+  <!-- Étiquettes des appels, posées sur la frontière -->
+  <rect x="590" y="375" width="94" height="34" rx="6" fill="#ffffff" stroke="#d9480f" stroke-width="1.5"/>
+  <text x="637" y="389" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11" fill="#d9480f">clone execve</text>
+  <text x="637" y="403" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11" fill="#d9480f">dup2</text>
+
+  <rect x="687" y="375" width="94" height="34" rx="6" fill="#ffffff" stroke="#1c64b0" stroke-width="1.5"/>
+  <text x="734" y="389" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11" fill="#1c64b0">openat lseek</text>
+  <text x="734" y="403" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11" fill="#1c64b0">read write</text>
+
+  <rect x="784" y="375" width="94" height="34" rx="6" fill="#ffffff" stroke="#d9480f" stroke-width="1.5"/>
+  <text x="831" y="389" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11" fill="#d9480f">vfork clone</text>
+  <text x="831" y="403" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11" fill="#d9480f">execve</text>
+
+  <!-- Légende -->
+  <line x1="40" y1="602" x2="70" y2="602" stroke="#d9480f" stroke-width="2.5"/>
+  <text x="78" y="606">création de processus / lancement de programme (bash → python3, forkserver → workers)</text>
+  <line x1="40" y1="620" x2="70" y2="620" stroke="#1c64b0" stroke-width="2.5"/>
+  <text x="78" y="624">lecture du journal par chaque worker, écriture du rapport</text>
+</svg>

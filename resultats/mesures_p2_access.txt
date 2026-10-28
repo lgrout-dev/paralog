@@ -1,0 +1,16 @@
+=== Mesures de performance ParaLog — P2 (version parallèle) ===
+
+Journal    : data/access.log (9000000 lignes)
+Machine    : Intel(R) Core(TM) i5-8210Y CPU @ 1.60GHz, 2 cœurs physiques, 4 cœurs logiques
+Python     : Python 3.15.0
+Date       : 26/10/2026 14:49
+Essais     : 3 par version (temps = « Temps d'analyse » affiché par le programme)
+
+Version      Temps des essais (s)             Médiane Accélération
+séquentiel   40.957 34.321 34.534               34.534         x1.00
+1 worker(s)  38.239 35.506 39.729               38.239         x0.90
+2 worker(s)  27.369 23.592 23.962               23.962         x1.44
+4 worker(s)  30.583 26.727 27.949               27.949         x1.24
+8 worker(s)  30.238 30.136 27.389               30.136         x1.15
+
+Accélération = médiane séquentielle ÷ médiane de la version.

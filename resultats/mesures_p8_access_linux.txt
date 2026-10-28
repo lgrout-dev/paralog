@@ -1,0 +1,23 @@
+=== Mesures de performance ParaLog — P8 (processus ou threads ?) ===
+
+Journal    : data/access.log (9000000 lignes)
+Machine    : AMD Ryzen 7 5800H with Radeon Graphics, 8 cœurs physiques, 16 cœurs logiques
+Système    : Linux 6.6.87.2-microsoft-standard-WSL2
+Python     : Python 3.12.3
+Date       : 28/10/2026 13:25
+Essais     : 3 par version, entrelacés ; rapports tous identiques au séquentiel (hors temps)
+
+Version        Temps des essais (s)        Médiane Accélération  Cœurs occupés
+séquentiel     18.706 18.532 18.597          18.597         x1.00             0.93
+1 thread(s)    20.433 20.244 20.691          20.433         x0.91             0.92
+2 thread(s)    20.087 21.204 21.525          21.204         x0.88             0.94
+4 thread(s)    21.668 21.734 21.821          21.734         x0.86             0.95
+8 thread(s)    22.308 22.037 21.909          22.037         x0.84             0.97
+1 processus    19.130 18.958 19.316          19.130         x0.97             0.93
+2 processus    10.719 10.724 10.655          10.719         x1.73             1.81
+4 processus    5.832 6.451 5.993              5.993         x3.10             3.60
+8 processus    4.342 4.039 4.282              4.282         x4.34             7.09
+
+Accélération  = médiane séquentielle ÷ médiane de la version.
+Cœurs occupés = temps CPU (user + sys) ÷ temps réel de la commande (médiane des essais) :
+                1 = un seul cœur calcule à la fois ; N = N cœurs calculent en même temps.
