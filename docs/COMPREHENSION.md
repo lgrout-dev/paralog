@@ -5,7 +5,7 @@ Il est mis à jour à chaque changement du projet (voir le [journal des modifica
 
 Le `README.md` à la racine est celui du kit fourni par l'école : on ne le modifie pas.
 
-Ce document est **personnel et non versionné** : il est exclu par le `.gitignore`.
+Ce document est **versionné** depuis le 28/10 (commit `59fbaf6`, retiré du `.gitignore`) ; il était auparavant local.
 
 ---
 
@@ -23,8 +23,9 @@ Ce document est **personnel et non versionné** : il est exclu par le `.gitignor
 10. [Dossier d'architecture (PDF)](#10-dossier-darchitecture-pdf)
 11. [P7 — Analyse des limites](#11-p7--analyse-des-limites)
 12. [Rapport de performance (PDF)](#12-rapport-de-performance-pdf)
-13. [Prochaines étapes](#13-prochaines-étapes)
-13. [Journal des modifications](#journal-des-modifications)
+13. [P8 — Processus ou threads ?](#13-p8--processus-ou-threads-)
+14. [Prochaines étapes](#14-prochaines-étapes)
+15. [Journal des modifications](#journal-des-modifications)
 
 ---
 
@@ -43,6 +44,7 @@ Le projet se déroule en deux étapes :
 | **A2–A5, A7, A8** | Scripts Bash : installation, droits et groupe, lancement, chaîne de contrôle, nettoyage, archivage. | Faits le 27/10, testés dans la VM Ubuntu (voir [section 8](#8-scripts-bash-a2-à-a8)) |
 | **A6** | Schéma en couches avec au moins deux appels système. | Fait le 27/10 : `docs/schema_A6.md` + `.svg`, appels relevés avec `strace` par `scripts/tracer_appels.sh` (voir [section 9](#9-a6--schéma-en-couches-et-appels-système)) |
 | **P7** | Expliquer pourquoi le gain n'est pas proportionnel à N (cœurs, création des processus, disque, partie non parallélisable). | Fait le 27/10 : `docs/limites_P7.md` + mesure de chaque cause par `scripts/mesurer_limites.py` → `resultats/limites_access.txt` (voir [section 11](#11-p7--analyse-des-limites)) |
+| **P8** (Attendu) | Mesurer la même analyse avec des threads puis avec des processus, expliquer l'écart. | Fait le 28/10 sur le PC (Ryzen 8 cœurs, WSL) : `src/analyse_threads.py`, `scripts/mesurer_p8.sh`, `docs/threads_P8.md`. 8 threads : x0,84, 0,97 cœur occupé (GIL) ; 8 processus : x4,34, 7,09 cœurs (voir [section 13](#13-p8--processus-ou-threads-)). Mesure Mac à faire |
 | **Dossier d'architecture** | Livrable PDF (10 pages max) : arborescence commentée (A1), schéma (A6), droits (A3), mode d'emploi des scripts. | Fait le 27/10 : `docs/dossier_architecture.pdf` (10 pages depuis l'ajout de `mesurer_limites.py`), source `.html`, produit par `scripts/generer_pdf.sh` (voir [section 10](#10-dossier-darchitecture-pdf)). Page de garde à compléter |
 | **Rapport de performance** | Livrable PDF (6 pages max) : code, test, tableau et graphique des temps, analyse (P1 à P10). | Fait le 27/10 : `docs/rapport_performance.pdf` (6 pages), source `.html`, `bash scripts/generer_pdf.sh rapport_performance` (voir [section 12](#12-rapport-de-performance-pdf)). Page de garde à compléter |
 
@@ -55,8 +57,8 @@ Contraintes générales : Python 3.8+, bibliothèque standard uniquement, aucun 
 ```
 paralog/
 ├── README.md                    kit de l'école (ne pas modifier)
-├── .gitignore                   exclut access.log, __pycache__/, COMPREHENSION.md,
-│                                les rapports de lancer.sh et les archives .tar.gz
+├── .gitignore                   exclut access.log, __pycache__/, les rapports de lancer.sh,
+│                                les archives .tar.gz, les sources et PDF des livrables
 ├── data/
 │   ├── echantillon_access.log   100 000 lignes (~20 Mo), versionné, pour tester vite
 │   └── access.log               9 M lignes (~1,9 Go), généré, NON versionné
@@ -73,6 +75,7 @@ paralog/
 │   ├── tracer_graphique.py      graphique SVG des mesures (P6), sans matplotlib
 │   ├── demontrer_p4.py          preuve « aucune donnée partagée » à l'exécution (P4)
 │   ├── mesurer_limites.py       décompose le temps de P2 cause par cause (P7)
+│   ├── mesurer_p8.sh            threads vs processus (N = 1, 2, 4, 8), 3 essais, cœurs occupés (P8)
 │   ├── tracer_appels.sh         relevé strace des appels système du schéma (A6, Linux)
 │   └── generer_pdf.sh [NOM]     imprime un livrable en PDF (Chrome headless) : dossier d'architecture
 │                                par défaut, ou rapport_performance ; NON versionné
@@ -80,15 +83,17 @@ paralog/
 │   ├── analyse_commun.py        analyse des lignes (partagé P1 / P2)
 │   ├── rapport.py               mise en forme du rapport (partagé P1 / P2)
 │   ├── analyse_seq.py           programme principal P1
-│   └── analyse_par.py           programme principal P2 (parallèle)
+│   ├── analyse_par.py           programme principal P2 (parallèle, processus)
+│   └── analyse_threads.py       même analyse avec des threads (P8), réutilise P2
 ├── docs/
-│   ├── COMPREHENSION.md         ce document (local, NON versionné)
+│   ├── COMPREHENSION.md         ce document (versionné depuis le 28/10)
 │   ├── dossier_architecture.html   source du dossier d'architecture (NON versionné)
 │   ├── dossier_architecture.pdf    le livrable PDF, 10 pages (NON versionné)
 │   ├── rapport_performance.html    source du rapport de performance (NON versionné)
 │   ├── rapport_performance.pdf     le livrable PDF, 6 pages (NON versionné)
 │   ├── concurrence_P4_P5.md     rédaction P4 / P5 pour le rapport de performance (versionné)
 │   ├── limites_P7.md            rédaction P7 (limites de l'accélération) pour le rapport de performance (versionné)
+│   ├── threads_P8.md            rédaction P8 (threads vs processus, GIL) pour le rapport de performance (versionné)
 │   ├── droits_A3.md             groupe, tableau des droits, preuve (dossier d'architecture, versionné)
 │   ├── schema_A6.md             schéma en couches + appels système relevés (versionné)
 │   └── schema_A6.svg            le même schéma dessiné, pour le PDF (versionné)
@@ -99,7 +104,8 @@ paralog/
 │   ├── mesures_p1.txt           3 temps P1 + médiane
 │   ├── mesures_p2_access.txt/.csv   mesures P6 : P1 + P2 (N = 1, 2, 4, 8), 3 essais, médianes, accélération
 │   ├── graphique_p2_access.svg  graphique P6 (temps médian + accélération selon N)
-│   └── limites_access.txt       sortie de mesurer_limites.py sur access.log (P7)
+│   ├── limites_access.txt       sortie de mesurer_limites.py sur access.log (P7)
+│   └── mesures_p8_access_linux.txt/.csv   mesures P8 sur le PC (WSL) ; _macos.* pour le Mac
 └── archives/                    archives de archiver.sh (700, NON versionnées)
 ```
 
@@ -880,7 +886,90 @@ bash scripts/generer_pdf.sh                       # -> docs/dossier_architecture
 
 ---
 
-## 13. Prochaines étapes
+## 13. P8 — Processus ou threads ?
+
+### 13.1 Ce qui était demandé
+
+| # | Demande (sujet) | Fait | Où |
+| --- | --- | --- | --- |
+| P8 (Attendu) | Mesurer la même analyse avec des threads puis avec des processus, et expliquer l'écart observé | ✅ PC (WSL) ; Mac à faire | `src/analyse_threads.py`, `scripts/mesurer_p8.sh`, `docs/threads_P8.md`, `resultats/mesures_p8_access_linux.txt/.csv` |
+
+**Changement de machine :** depuis le 28/10, le travail se fait sur un PC portable Windows + **WSL2**
+(AMD Ryzen 7 5800H, **8 cœurs physiques / 16 logiques**, Python 3.12.3, dépôt sur le disque ext4 de WSL).
+P6 et P7 ont été mesurées sur le Mac (2 cœurs) : les chiffres de P8 se comparent entre eux, pas avec P6.
+Les sources HTML / PDF des livrables et `generer_pdf.sh` (non versionnés) sont restés sur le Mac.
+
+### 13.2 `src/analyse_threads.py` — la même analyse avec des threads
+
+- Même interface que P2 (`JOURNAL [N]`), mêmes messages, mêmes codes de retour, même chronomètre.
+- **Une seule différence avec P2 :** `ThreadPool(processes=n)` (de `multiprocessing.pool`) au lieu de `Pool(processes=n)`.
+  `ThreadPool` a la même interface (`starmap`), ses workers sont des threads du même processus.
+- `calculer_blocs`, `analyser_bloc` et `lire_nombre_workers` sont **importés** de `analyse_par.py` (pas copiés) :
+  c'est donc vraiment « la même analyse ». Importer `analyse_par` ne lance pas P2, grâce à son `if __name__ == "__main__":`.
+- Pas de verrou : chaque thread crée ses propres `Counter` dans `analyser_bloc` et les renvoie ; fusion après `starmap` (comme P4).
+
+### 13.3 `scripts/mesurer_p8.sh JOURNAL [ESSAIS]`
+
+- Même modèle que `mesurer.sh` : versions `seq`, `t1 t2 t4 t8` (threads), `p1 p2 p4 p8` (processus), 3 essais
+  entrelacés, médianes, accélération, machine décrite (Linux et macOS).
+- En plus du « Temps d'analyse » : temps **CPU** (user + sys, `time` de bash avec `TIMEFORMAT="%U %S"`) et temps
+  **réel** sur l'horloge monotone → **cœurs occupés = CPU ÷ réel**. C'est la mesure qui montre le GIL.
+- Chaque rapport est comparé au séquentiel (`diff`, hors temps) : un seul différent → arrêt, code 1.
+- Sortie `resultats/mesures_p8_NOM_SYS.txt/.csv`, `SYS` = `linux` ou `macos` : les deux machines ne s'écrasent pas.
+- Codes : 0 = OK ; 1 = fichier absent / dossier / illisible, version en échec ou rapport différent ; 2 = mauvaise utilisation.
+
+**Piège rencontré (à savoir raconter) :** la 1re mesure prenait le temps réel du `time` de bash. Plusieurs essais avaient
+un temps réel **plus petit** que le temps d'analyse (15,48 s pour 17,80 s), toujours d'environ 2,3 s. Cause : WSL
+recale son **horloge murale** sur Windows (saut de −2,4 s relevé pendant un test de 45 s comparant `time.time()`
+et `time.monotonic()`). Le `time` de bash utilise l'horloge murale ; `time.perf_counter()` (nos programmes) est
+monotone, donc les temps d'analyse et accélérations étaient justes. Correction : `horloge()` lit
+`time.monotonic()`. Mesure relancée : 27 essais, 0 anomalie. Anciennes mesures gardées hors dépôt (scratchpad).
+
+### 13.4 Résultats (`access.log`, PC WSL, 28/10/2026 13:25, médianes de 3 essais)
+
+| Version | Temps | Accélération | CPU | Cœurs occupés |
+| --- | --- | --- | --- | --- |
+| Séquentiel | 18,597 s | x1,00 | 17,25 s | 0,93 |
+| 1 / 2 / 4 / 8 threads | 20,433 / 21,204 / 21,734 / 22,037 s | x0,91 / x0,88 / x0,86 / **x0,84** | 18,91 → 21,37 s | 0,92 → **0,97** |
+| 1 / 2 / 4 / 8 processus | 19,130 / 10,719 / 5,993 / 4,282 s | x0,97 / x1,73 / x3,10 / **x4,34** | 17,76 → 30,31 s | 0,93 / 1,81 / 3,60 / **7,09** |
+
+### 13.5 Ce qu'il faut savoir expliquer
+
+- **GIL** (*Global Interpreter Lock*) : dans CPython, un seul thread par processus exécute du code Python à la fois.
+  Il est relâché pendant les entrées / sorties et toutes les 5 ms (`sys.getswitchinterval()`).
+- **Threads :** notre travail est du calcul Python (`split`, `isdigit`, `Counter`) → les threads calculent **à tour de
+  rôle** : 0,97 cœur occupé avec 8 threads. Ils existent bien (`ps` : 1 processus, 12 threads), mais ne travaillent pas en même temps.
+- **Threads un peu plus lents que le séquentiel :** le CPU monte de 18,91 à 21,37 s de 1 à 8 threads = coût des passages
+  de relais du GIL (réveil d'un thread, cache). Sys de 2,0 à 3,1 s : *hypothèse non vérifiée* = appels `futex`.
+- **Processus :** un interpréteur et **un GIL par processus** → 7,09 cœurs occupés avec 8, x4,34. Pas x8 : CPU
+  17,76 → 30,31 s (cache et mémoire partagés, fréquence plus basse avec 8 cœurs actifs) + parties non parallélisables (P7).
+- **Quand les threads servent :** entrées / sorties (réseau, disque lent), code C qui relâche le GIL, Python 3.13
+  « free-threaded » sans GIL (non testé, non installé).
+- **Lien P4 :** threads = mémoire partagée → un `Counter` commun serait une vraie section critique (`+= 1` n'est pas
+  atomique, le GIL peut changer de thread au milieu) ; notre conception l'évite (un `Counter` par thread).
+
+### 13.6 Vérifications (28/10, PC WSL)
+
+| Vérification | Résultat |
+| --- | --- |
+| `analyse_threads.py` échantillon, N = 1, 2, 4, 8 : `diff` avec P1 hors temps | IDENTIQUE ✅ |
+| Sans argument / 3 arguments / absent / dossier / N = `0`, `-3`, `abc` / fichier vide / depuis `/` | Codes 2 / 2 / 1 / 1 / 2 / 0 / 0 ✅ |
+| `ps` pendant `analyse_threads.py … 8` | 1 processus, 12 threads, 0 fils ✅ |
+| `mesurer_p8.sh` échantillon (3 essais) ; erreurs (sans arg, 3 args, absent, dossier, illisible, ESSAIS `0` / `abc`) ; depuis `/` | Code 0 ; codes 2 / 2 / 1 / 1 / 1 / 2 / 2 ; code 0 ✅ |
+| Contre-épreuve : copie avec une version threads faussée (1 ligne en moins) | « diffère du séquentiel », code 1 ✅ |
+| `access.log` (lancé par Louis) | 27 rapports identiques au séquentiel, réel ≥ temps d'analyse pour les 27 essais ✅ |
+
+### 13.7 Comment lancer
+
+```bash
+python3 src/analyse_threads.py data/echantillon_access.log 4    # rapport avec 4 threads
+bash scripts/mesurer_p8.sh data/echantillon_access.log 1          # essai rapide (puis supprimer les fichiers _echantillon_)
+bash scripts/mesurer_p8.sh data/access.log                        # mesure officielle (~10 min sur le PC, plus sur le Mac)
+```
+
+---
+
+## 14. Prochaines étapes
 
 Point d'avancement n°3 le **mercredi 28 octobre** (toutes les fonctionnalités « Indispensable » démontrées), dépôt le **jeudi 29 à 12h30**.
 
@@ -892,8 +981,12 @@ Point d'avancement n°3 le **mercredi 28 octobre** (toutes les fonctionnalités 
 6. ~~Dossier d'architecture (PDF)~~ : fait le 27/10 (`docs/dossier_architecture.pdf`, 9 pages, voir section 10). **À faire par Louis :** compléter la page de garde (champs surlignés en jaune dans le `.html` : équipe, chef de projet, noms) puis `bash scripts/generer_pdf.sh` ; relire l'encadré « Usage d'un outil d'IA » ; relancer `bash scripts/installer.sh` dans la VM (met les nouveaux fichiers en 640/750 au groupe `paralog`).
 7. ~~P7~~ : fait le 27/10 (`docs/limites_P7.md`, `scripts/mesurer_limites.py`, voir section 11). **À faire par Louis :** relancer `bash scripts/installer.sh` dans la VM (met les 3 nouveaux fichiers au groupe `paralog`).
 8. ~~PDF du rapport de performance~~ : fait le 27/10 (`docs/rapport_performance.pdf`, 6 pages, voir section 12). `mesurer_limites.py` ajouté au dossier d'architecture (désormais 10 pages). **À faire par Louis :** compléter la page de garde des deux `.html` (champs jaunes) puis `bash scripts/generer_pdf.sh rapport_performance` et `bash scripts/generer_pdf.sh` ; relire les encadrés « Usage d'un outil d'IA ».
-9. **Prochaine étape : gestion de projet** G1 à G6 (dossier PDF, 12 pages max) : note de cadrage, backlog / WBS / RACI, PERT et Gantt, registre des risques, Kanban et comptes rendus des 3 points, REX.
-10. Bonus si le temps le permet : P8 (threads vs processus : si fait, remplacer « Non réalisé » dans le rapport, qui est à 6 pages, il faudra condenser), A9 (relevé `ps` / `top` pendant une exécution).
+9. ~~P8 (Attendu, pas Bonus)~~ : fait le 28/10 sur le PC WSL (voir section 13). **À faire par Louis :**
+   - sur le Mac : récupérer `src/analyse_threads.py` et `scripts/mesurer_p8.sh`, lancer `bash scripts/mesurer_p8.sh data/access.log` (→ `resultats/mesures_p8_access_macos.*`), puis ajouter ses chiffres à `docs/threads_P8.md` ;
+   - dans `docs/rapport_performance.html` (sur le Mac) : P8 « Non réalisé » → « Fait », ajouter un résumé de `threads_P8.md` (tableau + GIL), en condensant pour rester à **6 pages**, puis `bash scripts/generer_pdf.sh rapport_performance` ; ajouter `analyse_threads.py` et `mesurer_p8.sh` à l'arborescence du dossier d'architecture (attention, déjà à 10 pages) ;
+   - relancer `bash scripts/installer.sh` (droits et groupe des nouveaux fichiers).
+10. **Prochaine étape : gestion de projet** G1 à G6 (dossier PDF, 12 pages max, **Indispensable**) : note de cadrage, backlog / WBS / RACI, PERT et Gantt, registre des risques, Kanban et comptes rendus des 3 points, REX.
+11. Bonus si le temps le permet : A9 (relevé `ps` / `top` pendant une exécution ; `ps -o pid,nlwp` déjà utilisé pour P8), P10 (producteur / consommateur), G9 (éthique et sobriété).
 
 ---
 
@@ -922,3 +1015,4 @@ Point d'avancement n°3 le **mercredi 28 octobre** (toutes les fonctionnalités 
 | 2026-10-27 | `.gitignore` : ajout de `docs/dossier_architecture.html`, `docs/dossier_architecture.pdf` et `scripts/generer_pdf.sh` (choix de Louis : non versionnés). Section 2 mise à jour. |
 | 2026-10-27 | P7 : création de `scripts/mesurer_limites.py` (décompose le temps de P2 : lecture disque, Pool vide, temps écoulé / CPU de chaque worker, découpage, surcoût, fusion, taille des résultats), de `resultats/limites_access.txt` (mesure sur `access.log`, Mac) et de `docs/limites_P7.md`. Conclusions : partie non parallélisable du code 0,4–2,2 % ; limites = 2 cœurs physiques (hyperthreading : CPU ×2 à N = 4), baisse de fréquence (+21 % CPU à N = 2), lecture à froid sur le partage NFS d'OrbStack (26,6 s). Nouvelle section 11 ; sommaire, sections 1, 2, 5.1, 6.5 et prochaines étapes (devenue section 12, prochaine : PDF du rapport de performance) mises à jour. |
 | 2026-10-27 | Rapport de performance : création de `docs/rapport_performance.html` et `.pdf` (6 pages : garde, couverture P1–P10, programme, P3, P6 avec tableau et graphique, P4, P5, P7, P9, limites, usage de l'IA). `scripts/generer_pdf.sh` généralisé (argument `NOM`, limite de pages par livrable). Dossier d'architecture : `mesurer_limites.py`, `limites_access.txt`, `limites_P7.md` et le rapport ajoutés (arbre + récapitulatif), 10 pages. `.gitignore` : source et PDF du rapport non versionnés. Nouvelle section 12 ; sommaire, sections 1, 2, 10.5 et prochaines étapes (devenue section 13, prochaine : gestion de projet) mises à jour. |
+| 2026-10-28 | P8 : création de `src/analyse_threads.py` (même analyse que P2 avec `ThreadPool`, fonctions importées de P2), `scripts/mesurer_p8.sh` (threads vs processus N = 1, 2, 4, 8, 3 essais, cœurs occupés = CPU ÷ réel, `diff` de chaque rapport) et `docs/threads_P8.md`. Mesure `access.log` sur le PC WSL (Ryzen 7 5800H, 8 cœurs) → `resultats/mesures_p8_access_linux.*` : 8 threads x0,84 / 0,97 cœur (GIL), 8 processus x4,34 / 7,09 cœurs. Saut d'horloge de WSL (−2,4 s) détecté et corrigé (temps réel sur l'horloge monotone), mesure relancée. Nouvelle section 13 ; sommaire, en-tête (document désormais versionné), sections 1, 2 et prochaines étapes (devenue section 14) mises à jour. |
